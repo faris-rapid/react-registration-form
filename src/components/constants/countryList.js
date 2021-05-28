@@ -1,0 +1,16 @@
+export const CountryList = [
+	'Afghanistan',
+	'Australia',
+	'Brazil',
+	'Canada',
+	'China',
+	'England',
+	'France',
+	'Germany',
+	'India',
+	'New Zealand',
+	'Singapore',
+	'Spain',
+	'Sri Lanka',
+	'United States',
+];
