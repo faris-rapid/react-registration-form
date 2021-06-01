@@ -12,8 +12,8 @@ function App() {
 
 	return (
 		<div className="App">
-			{userData === null && <UserForm regData={getFormData} />}
-			{userData !== null && <DisplayUser userData={userData} />}
+			{!userData && <UserForm regData={getFormData} />}
+			{userData && <DisplayUser userData={userData} />}
 		</div>
 	);
 }
