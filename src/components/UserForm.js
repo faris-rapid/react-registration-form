@@ -77,17 +77,16 @@ const AddUserForm = (props) => {
 			return;
 		}
 
-		const userData = {
-			fname: formData.fname,
-			lname: formData.lname,
-			email: formData.email,
-			country: formData.country,
-			dob: formData.dob,
-			gender: formData.gender,
-		};
-
-		props.regData(userData);
+		props.regData(formData);
 	};
+
+	const {
+		fname = '',
+		lname = '',
+		email = '',
+		country = '',
+		dob = '',
+	} = formData;
 
 	return (
 		<div>
@@ -99,7 +98,7 @@ const AddUserForm = (props) => {
 						<input
 							type="text"
 							name="fname"
-							value={formData.fname}
+							value={fname}
 							onChange={eventChangeHandler}
 							required
 						/>
@@ -110,7 +109,7 @@ const AddUserForm = (props) => {
 						<input
 							type="text"
 							name="lname"
-							value={formData.lname}
+							value={lname}
 							onChange={eventChangeHandler}
 						/>
 					</div>
@@ -120,7 +119,7 @@ const AddUserForm = (props) => {
 						<input
 							type="email"
 							name="email"
-							value={formData.email}
+							value={email}
 							onChange={eventChangeHandler}
 							required
 						/>
@@ -131,7 +130,7 @@ const AddUserForm = (props) => {
 						<input
 							type="text"
 							name="country"
-							value={formData.country}
+							value={country}
 							onChange={eventChangeHandler}
 							required
 						/>
@@ -148,7 +147,7 @@ const AddUserForm = (props) => {
 						<input
 							type="date"
 							name="dob"
-							value={formData.dob}
+							value={dob}
 							onChange={eventChangeHandler}
 							required
 						/>
