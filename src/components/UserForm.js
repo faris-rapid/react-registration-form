@@ -9,8 +9,8 @@ const UserForm = (props) => {
 		email: '',
 		country: '',
 		dob: '',
-		gender: null,
-		interest: null,
+		gender: '',
+		interest: '',
 	});
 	const [interestList, setInterestList] = useState([]);
 	const [filteredCountry, setFilteredCountry] = useState([]);
@@ -52,7 +52,7 @@ const UserForm = (props) => {
 		let list = [...interestList];
 
 		//interest validation
-		if (!formData.interest) {
+		if (formData.interest === '') {
 			setError({
 				...error,
 				interestError: 'Interest cannot be blank',
@@ -102,7 +102,7 @@ const UserForm = (props) => {
 		}
 
 		//preventing data submit
-		if (!formData.gender || formData.fname.length < 3) {
+		if (formData.gender === '' || formData.fname.length < 3) {
 			return;
 		}
 
