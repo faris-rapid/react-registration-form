@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CountryList } from './constants/countryList';
-import styles from './AddUserForm.module.css';
+import { CountryList } from '../../constants/countryList';
+import styles from './UserForm.module.css';
 
 const UserForm = (props) => {
 	const [formData, setFormData] = useState({
