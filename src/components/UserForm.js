@@ -3,29 +3,55 @@ import { CountryList } from './constants/countryList';
 import styles from './AddUserForm.module.css';
 
 const AddUserForm = (props) => {
-	const [fname, setFname] = useState('');
-	const [lname, setLname] = useState('');
-	const [email, setEmail] = useState('');
-	const [country, setCountry] = useState('');
+	const [formData, setFormData] = useState({
+		fname: '',
+		lname: '',
+		email: '',
+		country: '',
+		dob: '',
+		gender: '',
+	});
+
 	const [filteredCountry, setFilteredCountry] = useState([]);
-	const [dob, setDob] = useState('');
-	const [gender, setGender] = useState('');
 	const [error, setError] = useState({
 		fnameError: '',
 		genderError: '',
-		isFnameValid: false,
 		isGenderValid: false,
 	});
 
 	let countryLists = CountryList;
 
-	const fnameChangeHandler = (event) => {
-		setFname(event.target.value);
+	const suggestionHandler = (event) => {
+		setFormData({ formData, country: event.target.innerText });
+		setFilteredCountry([]);
 	};
 
-	//firstname validation
-	const fnameOnBlur = () => {
-		if (fname.length < 3) {
+	const eventChangeHandler = (event) => {
+		setFormData({ ...formData, [event.target.name]: event.target.value });
+
+		//country type ahead
+		if (event.target.name === 'country')
+			setFilteredCountry(
+				countryLists.filter((element) => {
+					return element.toLowerCase().includes(event.target.value);
+				})
+			);
+
+		//gender validation
+		if (event.target.name === 'gender') {
+			setError((prevValue) => ({
+				...prevValue,
+				isGenderValid: true,
+				genderError: '',
+			}));
+		}
+	};
+
+	const submitHandler = (event) => {
+		event.preventDefault();
+
+		//fname validation
+		if (formData.fname.length < 3) {
 			setError((prevValue) => ({
 				...prevValue,
 				fnameError: 'Firstname: must contain more than two characters',
@@ -37,45 +63,6 @@ const AddUserForm = (props) => {
 				fnameError: '',
 			}));
 		}
-	};
-
-	const lnameChangeHandler = (event) => {
-		setLname(event.target.value);
-	};
-
-	const emailChangeHandler = (event) => {
-		setEmail(event.target.value);
-	};
-
-	const countryChangeHandler = (event) => {
-		setCountry(event.target.value);
-		setFilteredCountry(
-			countryLists.filter((element) => {
-				return element.toLowerCase().includes(event.target.value);
-			})
-		);
-	};
-
-	const suggestionHandler = (event) => {
-		setCountry(event.target.innerText);
-		setFilteredCountry([]);
-	};
-
-	const dobChangeHandler = (event) => {
-		setDob(event.target.value);
-	};
-
-	const genderChangeHandler = (event) => {
-		setGender(event.target.value);
-		setError((prevValue) => ({
-			...prevValue,
-			isGenderValid: true,
-			genderError: '',
-		}));
-	};
-
-	const submitHandler = (event) => {
-		event.preventDefault();
 
 		//gender validation
 		if (error.isGenderValid === false) {
@@ -86,21 +73,20 @@ const AddUserForm = (props) => {
 		}
 
 		//preventing data submit
-		if (error.isGenderValid === false || error.isFnameValid === false) {
+		if (error.isGenderValid === false || formData.fname.length < 3) {
 			return;
 		}
 
-		const userData = {
-			fname: fname,
-			lname: lname,
-			email: email,
-			country: country,
-			dob: dob,
-			gender: gender,
-		};
-
-		props.regData(userData);
+		props.regData(formData);
 	};
+
+	const {
+		fname = '',
+		lname = '',
+		email = '',
+		country = '',
+		dob = '',
+	} = formData;
 
 	return (
 		<div>
@@ -111,20 +97,20 @@ const AddUserForm = (props) => {
 						<label>Firstname</label>
 						<input
 							type="text"
+							name="fname"
 							value={fname}
-							onChange={fnameChangeHandler}
+							onChange={eventChangeHandler}
 							required
-							onBlur={fnameOnBlur}
 						/>
-						<p style={{ color: 'red' }}>{error.fnameError}</p>
 					</div>
 
 					<div>
 						<label>Lastname</label>
 						<input
 							type="text"
+							name="lname"
 							value={lname}
-							onChange={lnameChangeHandler}
+							onChange={eventChangeHandler}
 						/>
 					</div>
 
@@ -132,8 +118,9 @@ const AddUserForm = (props) => {
 						<label>Email</label>
 						<input
 							type="email"
+							name="email"
 							value={email}
-							onChange={emailChangeHandler}
+							onChange={eventChangeHandler}
 							required
 						/>
 					</div>
@@ -142,8 +129,9 @@ const AddUserForm = (props) => {
 						<label>Country</label>
 						<input
 							type="text"
+							name="country"
 							value={country}
-							onChange={countryChangeHandler}
+							onChange={eventChangeHandler}
 							required
 						/>
 						{filteredCountry.map((element) => (
@@ -158,8 +146,9 @@ const AddUserForm = (props) => {
 						<label>Date of Birth</label>
 						<input
 							type="date"
+							name="dob"
 							value={dob}
-							onChange={dobChangeHandler}
+							onChange={eventChangeHandler}
 							required
 						/>
 					</div>
@@ -169,24 +158,25 @@ const AddUserForm = (props) => {
 							type="radio"
 							name="gender"
 							value="male"
-							onChange={genderChangeHandler}
+							onChange={eventChangeHandler}
 						/>
 						Male
 						<input
 							type="radio"
 							name="gender"
 							value="female"
-							onChange={genderChangeHandler}
+							onChange={eventChangeHandler}
 						/>
 						Female
 						<input
 							type="radio"
 							name="gender"
 							value="others"
-							onChange={genderChangeHandler}
+							onChange={eventChangeHandler}
 						/>
 						Others
 						<br />
+						<p style={{ color: 'red' }}>{error.fnameError}</p>
 						<p style={{ color: 'red' }}>{error.genderError}</p>
 						<br />
 						<button>Submit</button>
