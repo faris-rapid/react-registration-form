@@ -1,34 +1,23 @@
 import React from 'react';
 import Table from '@material-ui/core/Table';
 import { TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import { v4 } from 'uuid';
 
 const DisplayUser = (props) => {
+	const { fname, lname, email, dob, gender, interestList } = props.userData;
+
 	const userData = {
-		Name: `${props.userData.fname} ${props.userData.lname}`,
-		Email: props.userData.email,
-		DOB: props.userData.dob,
-		Gender: props.userData.gender,
-		Interests: props.userData.interestList.map((element) => <li>{element}</li>),
+		Name: `${fname} ${lname}`,
+		Email: email,
+		DOB: dob,
+		Gender: gender,
+		Interests: interestList.map((element) => <li key={v4()}>{element}</li>),
 	};
 
 	return (
 		<div style={{ margin: 'auto', width: '50%' }}>
 			<h2>User Details</h2>
-			{/* <h4>
-				Name: {props.userData.fname} {props.userData.lname}
-			</h4>
-			<div>
-				<h4>Email: {props.userData.email}</h4>
-				<h4>Country: {props.userData.country}</h4>
-				<h4>DOB: {props.userData.dob}</h4>
-				<h4>Gender: {props.userData.gender}</h4>
-				<h4>
-					Interests:{' '}
-					{props.userData.interestList.map((element) => (
-						<li>{element}</li>
-					))}
-				</h4> */}
-			{/* </div> */}
 
 			<div>
 				<Table>
@@ -43,11 +32,11 @@ const DisplayUser = (props) => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{Object.keys(userData).map((key, index) => {
+						{Object.keys(userData).map((item, index) => {
 							return (
-								<TableRow key={index}>
-									<TableCell>{key}</TableCell>
-									<TableCell>{userData[key]}</TableCell>
+								<TableRow key={v4()}>
+									<TableCell>{item}</TableCell>
+									<TableCell>{userData[item]}</TableCell>
 								</TableRow>
 							);
 						})}
@@ -59,3 +48,7 @@ const DisplayUser = (props) => {
 };
 
 export default DisplayUser;
+
+DisplayUser.propTypes = {
+	userData: PropTypes.object,
+};
