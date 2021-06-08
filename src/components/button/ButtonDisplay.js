@@ -8,9 +8,15 @@ const ButtonDisplay = () => {
 	return (
 		<div style={{ textAlign: 'center', paddingTop: '50px' }}>
 			<Button primary>Primary Button</Button>
-			<Button outline>Outline Button</Button>
-			<Button pill>Pill Button</Button>
-			<Button square>Square Button</Button>
+			<Button outline color="blue">
+				Outline Button
+			</Button>
+			<Button pill color="green">
+				Pill Button
+			</Button>
+			<Button square color="blue">
+				Square Button
+			</Button>
 			<Button disabled>Disabled Button</Button>
 			<Button>
 				<FontAwesomeIcon icon={faCoffee} /> Icon Button

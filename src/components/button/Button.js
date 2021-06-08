@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 
 const Button = styled.button`
-	background: tomato;
+	background: ${(props) => (props.color ? props.color : 'tomato')};
 	border-radius: 5px;
 	border: 2px solid;
 	color: white;
@@ -12,29 +12,23 @@ const Button = styled.button`
 	${(props) =>
 		props.primary &&
 		css`
-			background: tomato;
 			color: white;
 		`}
 	${(props) =>
 		props.outline &&
 		css`
 			background: white;
-			color: tomato;
-			border: 2px solid tomato;
+			color: ${(props) => (props.color ? props.color : 'tomato')};
+			border: 2px solid ${(props) => (props.color ? props.color : 'tomato')};
 		`}
 		${(props) =>
 		props.pill &&
 		css`
-			background: green;
-			color: white;
 			border-radius: 20px;
 		`}
 		${(props) =>
 		props.square &&
 		css`
-			background: green;
-			color: white;
-			border: 2px solid;
 			border-radius: 0px;
 		`}
 		${(props) =>
