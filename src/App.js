@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
-import AddUserForm from './components/UserForm';
-import DisplayUser from './components/DisplayUser';
+import UserForm from './components/registration/UserForm';
+import DisplayUser from './components/registration/DisplayUser';
 
 function App() {
 	const [userData, setUserData] = useState(null);
@@ -12,7 +12,7 @@ function App() {
 
 	return (
 		<div className="App">
-			{!userData && <AddUserForm regData={getFormData} />}
+			{!userData && <UserForm regData={getFormData} />}
 			{userData && <DisplayUser userData={userData} />}
 		</div>
 	);
