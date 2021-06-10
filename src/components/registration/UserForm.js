@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CountryList } from '../../constants/countryList';
-import styles from './UserForm.module.css';
+import styles, { addButton, removeButton } from './UserForm.module.css';
 
 const UserForm = (props) => {
 	const [formData, setFormData] = useState({
@@ -194,21 +194,26 @@ const UserForm = (props) => {
 							onChange={eventChangeHandler}
 						/>
 
-						<button type="button" onClick={addInterestHandler}>
+						<button
+							className={addButton}
+							type="button"
+							onClick={addInterestHandler}>
 							+
 						</button>
 						<div style={{ color: 'red' }}>{error.interestError}</div>
-						{interestList.map((element, index) => (
-							<li key={element}>
-								{element}
-								<button
-									type="button"
-									style={{ backgroundColor: 'red', padding: '0.8px 3px' }}
-									onClick={removeInterestHandler}>
-									x
-								</button>
-							</li>
-						))}
+						<div>
+							{interestList.map((element, index) => (
+								<li key={element}>
+									{element}{' '}
+									<button
+										className={removeButton}
+										type="button"
+										onClick={removeInterestHandler}>
+										x
+									</button>
+								</li>
+							))}
+						</div>
 					</div>
 					<div>
 						<label>Gender</label>
