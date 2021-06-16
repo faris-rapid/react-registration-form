@@ -15,12 +15,16 @@
 	margin-top: 6px;
 }
 
-.input input:not([type='radio']) {
-	width: 60%;
+.input input:not([type='radio']),
+textarea {
 	padding: 5px;
 	border: 1px solid #ccc;
 	border-radius: 10px;
 	width: 75%;
+}
+
+.input textarea {
+	resize: vertical;
 }
 
 .input li {
