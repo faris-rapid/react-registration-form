@@ -3,7 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { registrationActions } from '../../store/index';
 import { CountryList } from '../../constants/countryList';
-import styles, { addButton, removeButton } from './UserForm.module.css';
+import styles, {
+	addButton,
+	removeButton,
+	errorMessage,
+} from './UserForm.module.css';
+import ValidateOnBlur from './ValidateOnBlur';
+import ValidateOnSubmit from './ValidateOnSubmit';
 
 const UserForm = () => {
 	const formData = useSelector((state) => state.formData);
@@ -15,11 +21,13 @@ const UserForm = () => {
 
 	let countryLists = CountryList;
 
+	//country suggestion pick
 	const suggestionHandler = (event) => {
 		dispatch(
 			registrationActions.onChangeHandler({ country: event.target.innerText })
 		);
 		dispatch(registrationActions.countrySelect([]));
+		dispatch(registrationActions.errorHandler({ countryError: null }));
 	};
 
 	const eventChangeHandler = (event) => {
@@ -38,7 +46,7 @@ const UserForm = () => {
 				)
 			);
 		}
-		//gender error removal on selecting
+		// gender error removal on selecting
 		if (event.target.name === 'gender') {
 			dispatch(registrationActions.errorHandler({ genderError: null }));
 		}
@@ -64,7 +72,6 @@ const UserForm = () => {
 			dispatch(registrationActions.errorHandler({ interestError: null }));
 			dispatch(registrationActions.interestListAdd(interest));
 		}
-		// setFormData({ ...formData, interest: '' });
 		dispatch(registrationActions.onChangeHandler({ interest: '' }));
 	};
 
@@ -77,48 +84,27 @@ const UserForm = () => {
 
 	const submitHandler = (event) => {
 		event.preventDefault();
-		//fname validation
-		if (formData.firstname.length < 3) {
-			dispatch(
-				registrationActions.errorHandler({
-					fnameError: 'Firstname must contain more than two characters',
-				})
-			);
-		} else {
-			dispatch(
-				registrationActions.errorHandler({
-					fnameError: null,
-				})
-			);
+
+		//validation
+		const validate = ValidateOnSubmit(formData, interestList);
+		dispatch(registrationActions.errorHandler(validate));
+
+		// preventing data submit
+		// if (formData.gender === '' || formData.firstname.length < 3) {
+		// 	return;
+		// }
+		console.log('onSubmit', error);
+
+		if (Object.keys(error).every((item) => error[item] === null)) {
+			history.push('/formDetails');
 		}
-		//gender validation
-		if (!formData.gender) {
-			dispatch(
-				registrationActions.errorHandler({
-					genderError: 'Gender not marked',
-				})
-			);
-		}
-		//preventing data submit
-		if (formData.gender === '' || formData.firstname.length < 3) {
-			return;
-		}
-		//route to DisplayUser page
-		history.push('/formDetails');
 	};
 
-	const onBlurhandler = (event) => {
-		let formErrors = {};
-		//field required validation
-		if (event.target.value === '') {
-			formErrors[
-				`${event.target.name}Error`
-			] = `${event.target.name} is required`;
-		} else {
-			formErrors[`${event.target.name}Error`] = null;
-			console.log();
-		}
-		dispatch(registrationActions.errorHandler(formErrors));
+	const onBlurHandler = (event) => {
+		//validation
+		const validate = ValidateOnBlur(event.target.name, formData, interestList);
+		dispatch(registrationActions.errorHandler(validate));
+		console.log('onBlur', error);
 	};
 
 	const {
@@ -145,6 +131,7 @@ const UserForm = () => {
 		pinError,
 		addressError,
 		interestError,
+		genderError,
 	} = error;
 
 	return (
@@ -159,14 +146,11 @@ const UserForm = () => {
 							name="firstname"
 							value={firstname}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
 						{firstnameError && (
-							<div style={{ color: 'red' }}>{firstnameError}</div>
+							<div className={errorMessage}>{firstnameError}</div>
 						)}
-
-						<div style={{ color: 'red' }}>{error.fnameError}</div>
 					</div>
 					<div>
 						<label>Lastname</label>
@@ -174,12 +158,11 @@ const UserForm = () => {
 							type="text"
 							name="lastname"
 							value={lastname}
-							onBlur={onBlurhandler}
+							onBlur={onBlurHandler}
 							onChange={eventChangeHandler}
-							required
 						/>
 						{lastnameError && (
-							<div style={{ color: 'red' }}>{lastnameError}</div>
+							<div className={errorMessage}>{lastnameError}</div>
 						)}
 					</div>
 					<div>
@@ -188,12 +171,11 @@ const UserForm = () => {
 							type="text"
 							name="username"
 							value={username}
-							onBlur={onBlurhandler}
+							onBlur={onBlurHandler}
 							onChange={eventChangeHandler}
-							required
 						/>
 						{usernameError && (
-							<div style={{ color: 'red' }}>{usernameError}</div>
+							<div className={errorMessage}>{usernameError}</div>
 						)}
 					</div>
 					<div>
@@ -203,10 +185,9 @@ const UserForm = () => {
 							name="email"
 							value={email}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{emailError && <div style={{ color: 'red' }}>{emailError}</div>}
+						{emailError && <div className={errorMessage}>{emailError}</div>}
 					</div>
 					<div>
 						<label>Mobile number</label>
@@ -215,10 +196,9 @@ const UserForm = () => {
 							name="mobile"
 							value={mobile}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{mobileError && <div style={{ color: 'red' }}>{mobileError}</div>}
+						{mobileError && <div className={errorMessage}>{mobileError}</div>}
 					</div>
 					<div>
 						<label>Address</label>
@@ -227,10 +207,9 @@ const UserForm = () => {
 							name="address"
 							value={address}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{addressError && <div style={{ color: 'red' }}>{addressError}</div>}
+						{addressError && <div className={errorMessage}>{addressError}</div>}
 					</div>
 					<div>
 						<label>Country</label>
@@ -239,10 +218,9 @@ const UserForm = () => {
 							name="country"
 							value={country}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{countryError && <div style={{ color: 'red' }}>{countryError}</div>}
+						{countryError && <div className={errorMessage}>{countryError}</div>}
 						{filteredCountry.map((element) => (
 							<li key={element} onClick={suggestionHandler}>
 								{element}
@@ -256,10 +234,9 @@ const UserForm = () => {
 							name="pin"
 							value={pin}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{pinError && <div style={{ color: 'red' }}>{pinError}</div>}
+						{pinError && <div className={errorMessage}>{pinError}</div>}
 					</div>
 					<div>
 						<label>Date of Birth</label>
@@ -268,10 +245,9 @@ const UserForm = () => {
 							name="dob"
 							value={dob}
 							onChange={eventChangeHandler}
-							onBlur={onBlurhandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						{dobError && <div style={{ color: 'red' }}>{dobError}</div>}
+						{dobError && <div className={errorMessage}>{dobError}</div>}
 					</div>
 					<div>
 						<label>Area of Interests</label>
@@ -281,7 +257,7 @@ const UserForm = () => {
 							type="text"
 							name="interest"
 							value={interest}
-							onBlur={onBlurhandler}
+							onBlur={onBlurHandler}
 							onChange={eventChangeHandler}
 						/>
 
@@ -291,7 +267,7 @@ const UserForm = () => {
 							onClick={addInterestHandler}>
 							+
 						</button>
-						<div style={{ color: 'red' }}>{interestError}</div>
+						<div className={errorMessage}>{interestError}</div>
 						<div>
 							{interestList.map((element, index) => (
 								<li key={element}>
@@ -330,7 +306,7 @@ const UserForm = () => {
 						/>
 						Others
 						<br />
-						<div style={{ color: 'red' }}>{error.genderError}</div>
+						<div className={errorMessage}>{genderError}</div>
 						<br />
 						<button type="submit">Submit</button>
 					</div>

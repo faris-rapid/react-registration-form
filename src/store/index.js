@@ -15,8 +15,17 @@ const initialState = {
 		interest: '',
 	},
 	error: {
-		fnameError: null,
-		genderError: null,
+		firstnameError: '',
+		lastnameError: '',
+		usernameError: '',
+		emailError: '',
+		dobError: '',
+		mobileError: '',
+		countryError: '',
+		pinError: '',
+		addressError: '',
+		interestError: '',
+		genderError: '',
 	},
 	interestList: [],
 	filteredCountry: [],
@@ -40,9 +49,6 @@ const registrationSlice = createSlice({
 		},
 		interestListRemove: (state, action) => {
 			state.interestList = [...action.payload];
-		},
-		errorHandler: (state, action) => {
-			state.error = { ...state.error, ...action.payload };
 		},
 	},
 });

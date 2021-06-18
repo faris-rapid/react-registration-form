@@ -73,3 +73,8 @@ textarea {
 	color: white;
 	border: none;
 }
+
+.errorMessage {
+	color: red;
+	font-size: smaller;
+}

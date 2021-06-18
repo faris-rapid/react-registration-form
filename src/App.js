@@ -3,7 +3,6 @@ import UserForm from './components/registration/UserForm';
 import DisplayUser from './components/registration/DisplayUser';
 import ButtonDisplay from './components/button/ButtonDisplay';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import { Fragment } from 'react';
 
 function App() {
 	return (
