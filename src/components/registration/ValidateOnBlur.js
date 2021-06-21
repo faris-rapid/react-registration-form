@@ -118,10 +118,8 @@ const ValidateOnBlur = (name, formData, interestList) => {
 			break;
 
 		default:
-			console.log('ee');
 			break;
 	}
-	console.log('onSubmit', errors);
 
 	return errors;
 };

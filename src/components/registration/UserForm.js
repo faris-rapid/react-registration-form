@@ -89,12 +89,6 @@ const UserForm = () => {
 		const validate = ValidateOnSubmit(formData, interestList);
 		dispatch(registrationActions.errorHandler(validate));
 
-		// preventing data submit
-		// if (formData.gender === '' || formData.firstname.length < 3) {
-		// 	return;
-		// }
-		console.log('onSubmit', error);
-
 		if (Object.keys(error).every((item) => error[item] === null)) {
 			history.push('/formDetails');
 		}
@@ -104,7 +98,6 @@ const UserForm = () => {
 		//validation
 		const validate = ValidateOnBlur(event.target.name, formData, interestList);
 		dispatch(registrationActions.errorHandler(validate));
-		console.log('onBlur', error);
 	};
 
 	const {
