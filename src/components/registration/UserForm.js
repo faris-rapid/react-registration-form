@@ -1,127 +1,131 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { registrationActions } from '../../store/index';
 import { CountryList } from '../../constants/countryList';
-import styles, { addButton, removeButton } from './UserForm.module.css';
+import styles, {
+	addButton,
+	removeButton,
+	errorMessage,
+} from './UserForm.module.css';
+import ValidateOnBlur from './ValidateOnBlur';
+import ValidateOnSubmit from './ValidateOnSubmit';
 
-const UserForm = (props) => {
-	const [formData, setFormData] = useState({
-		fname: '',
-		lname: '',
-		email: '',
-		country: '',
-		dob: '',
-		gender: '',
-		interest: '',
-	});
-	const [interestList, setInterestList] = useState([]);
-	const [filteredCountry, setFilteredCountry] = useState([]);
-	const [error, setError] = useState({
-		fnameError: null,
-		genderError: null,
-	});
+const UserForm = () => {
+	const formData = useSelector((state) => state.formData);
+	const filteredCountry = useSelector((state) => state.filteredCountry);
+	const interestList = useSelector((state) => state.interestList);
+	const error = useSelector((state) => state.error);
+	const dispatch = useDispatch();
+	let history = useHistory();
 
 	let countryLists = CountryList;
 
+	//country suggestion pick
 	const suggestionHandler = (event) => {
-		setFormData({ ...formData, country: event.target.innerText });
-		setFilteredCountry([]);
+		dispatch(
+			registrationActions.onChangeHandler({ country: event.target.innerText })
+		);
+		dispatch(registrationActions.countrySelect([]));
+		dispatch(registrationActions.errorHandler({ countryError: null }));
 	};
 
 	const eventChangeHandler = (event) => {
-		setFormData({ ...formData, [event.target.name]: event.target.value });
-
+		dispatch(
+			registrationActions.onChangeHandler({
+				[event.target.name]: event.target.value,
+			})
+		);
 		//country type ahead
 		if (event.target.name === 'country') {
-			setFilteredCountry(
-				countryLists.filter((element) => {
-					return element.toLowerCase().includes(event.target.value);
-				})
+			dispatch(
+				registrationActions.countrySelect(
+					countryLists.filter((element) => {
+						return element.toLowerCase().includes(event.target.value);
+					})
+				)
 			);
 		}
-
+		// gender error removal on selecting
 		if (event.target.name === 'gender') {
-			//gender validation
-			setError((prevValue) => ({
-				...prevValue,
-				genderError: null,
-			}));
+			dispatch(registrationActions.errorHandler({ genderError: null }));
 		}
 	};
 
 	//adding new interest
 	const addInterestHandler = () => {
 		let list = [...interestList];
-
 		//interest validation
 		if (formData.interest === '') {
-			setError({
-				...error,
-				interestError: 'Interest cannot be blank',
-			});
+			dispatch(
+				registrationActions.errorHandler({
+					interestError: 'Interest cannot be blank',
+				})
+			);
 		} else if (!list.every((element) => element !== formData.interest)) {
-			setError({
-				...error,
-				interestError: `${formData.interest} already taken`,
-			});
+			dispatch(
+				registrationActions.errorHandler({
+					interestError: `${formData.interest} already taken`,
+				})
+			);
 		} else {
-			//adding data to interestList
-			setError({ ...error, interestError: null });
-			setInterestList([...interestList, formData.interest]);
+			dispatch(registrationActions.errorHandler({ interestError: null }));
+			dispatch(registrationActions.interestListAdd(interest));
 		}
-		setFormData({ ...formData, interest: '' });
+		dispatch(registrationActions.onChangeHandler({ interest: '' }));
 	};
 
 	//removing existing interest
 	const removeInterestHandler = (index) => {
 		const list = [...interestList];
 		list.splice(index, 1);
-		setInterestList(list);
+		dispatch(registrationActions.interestListRemove(list));
 	};
 
 	const submitHandler = (event) => {
 		event.preventDefault();
 
-		//fname validation
-		if (formData.fname.length < 3) {
-			setError((prevValue) => ({
-				...prevValue,
-				fnameError: 'Firstname must contain more than two characters',
-			}));
-		} else {
-			setError((prevValue) => ({
-				...prevValue,
-				fnameError: null,
-			}));
+		//validation
+		const validate = ValidateOnSubmit(formData, interestList);
+		dispatch(registrationActions.errorHandler(validate));
+
+		if (Object.keys(error).every((item) => error[item] === null)) {
+			history.push('/formDetails');
 		}
+	};
 
-		//gender validation
-		if (!formData.gender) {
-			setError((prevValue) => ({
-				...prevValue,
-				genderError: 'Gender not marked',
-			}));
-		}
-
-		//preventing data submit
-		if (formData.gender === '' || formData.fname.length < 3) {
-			return;
-		}
-
-		const userData = {
-			...formData,
-			interestList,
-		};
-
-		props.regData(userData);
+	const onBlurHandler = (event) => {
+		//validation
+		const validate = ValidateOnBlur(event.target.name, formData, interestList);
+		dispatch(registrationActions.errorHandler(validate));
 	};
 
 	const {
-		fname = '',
-		lname = '',
+		firstname = '',
+		lastname = '',
+		username = '',
 		email = '',
+		mobile = '',
+		address = '',
 		country = '',
+		pin = '',
 		dob = '',
 		interest = '',
 	} = formData;
+
+	const {
+		firstnameError,
+		lastnameError,
+		usernameError,
+		emailError,
+		dobError,
+		mobileError,
+		countryError,
+		pinError,
+		addressError,
+		interestError,
+		genderError,
+	} = error;
 
 	return (
 		<div>
@@ -132,21 +136,40 @@ const UserForm = (props) => {
 						<label>Firstname</label>
 						<input
 							type="text"
-							name="fname"
-							value={fname}
+							name="firstname"
+							value={firstname}
 							onChange={eventChangeHandler}
-							required
+							onBlur={onBlurHandler}
 						/>
-						<div style={{ color: 'red' }}>{error.fnameError}</div>
+						{firstnameError && (
+							<div className={errorMessage}>{firstnameError}</div>
+						)}
 					</div>
 					<div>
 						<label>Lastname</label>
 						<input
 							type="text"
-							name="lname"
-							value={lname}
+							name="lastname"
+							value={lastname}
+							onBlur={onBlurHandler}
 							onChange={eventChangeHandler}
 						/>
+						{lastnameError && (
+							<div className={errorMessage}>{lastnameError}</div>
+						)}
+					</div>
+					<div>
+						<label>Username</label>
+						<input
+							type="text"
+							name="username"
+							value={username}
+							onBlur={onBlurHandler}
+							onChange={eventChangeHandler}
+						/>
+						{usernameError && (
+							<div className={errorMessage}>{usernameError}</div>
+						)}
 					</div>
 					<div>
 						<label>Email</label>
@@ -155,8 +178,31 @@ const UserForm = (props) => {
 							name="email"
 							value={email}
 							onChange={eventChangeHandler}
-							required
+							onBlur={onBlurHandler}
 						/>
+						{emailError && <div className={errorMessage}>{emailError}</div>}
+					</div>
+					<div>
+						<label>Mobile number</label>
+						<input
+							type="number"
+							name="mobile"
+							value={mobile}
+							onChange={eventChangeHandler}
+							onBlur={onBlurHandler}
+						/>
+						{mobileError && <div className={errorMessage}>{mobileError}</div>}
+					</div>
+					<div>
+						<label>Address</label>
+						<textarea
+							type="text"
+							name="address"
+							value={address}
+							onChange={eventChangeHandler}
+							onBlur={onBlurHandler}
+						/>
+						{addressError && <div className={errorMessage}>{addressError}</div>}
 					</div>
 					<div>
 						<label>Country</label>
@@ -165,13 +211,25 @@ const UserForm = (props) => {
 							name="country"
 							value={country}
 							onChange={eventChangeHandler}
-							required
+							onBlur={onBlurHandler}
 						/>
+						{countryError && <div className={errorMessage}>{countryError}</div>}
 						{filteredCountry.map((element) => (
 							<li key={element} onClick={suggestionHandler}>
 								{element}
 							</li>
 						))}
+					</div>
+					<div>
+						<label>PIN Code</label>
+						<input
+							type="number"
+							name="pin"
+							value={pin}
+							onChange={eventChangeHandler}
+							onBlur={onBlurHandler}
+						/>
+						{pinError && <div className={errorMessage}>{pinError}</div>}
 					</div>
 					<div>
 						<label>Date of Birth</label>
@@ -180,8 +238,9 @@ const UserForm = (props) => {
 							name="dob"
 							value={dob}
 							onChange={eventChangeHandler}
-							required
+							onBlur={onBlurHandler}
 						/>
+						{dobError && <div className={errorMessage}>{dobError}</div>}
 					</div>
 					<div>
 						<label>Area of Interests</label>
@@ -191,6 +250,7 @@ const UserForm = (props) => {
 							type="text"
 							name="interest"
 							value={interest}
+							onBlur={onBlurHandler}
 							onChange={eventChangeHandler}
 						/>
 
@@ -200,7 +260,7 @@ const UserForm = (props) => {
 							onClick={addInterestHandler}>
 							+
 						</button>
-						<div style={{ color: 'red' }}>{error.interestError}</div>
+						<div className={errorMessage}>{interestError}</div>
 						<div>
 							{interestList.map((element, index) => (
 								<li key={element}>
@@ -208,7 +268,7 @@ const UserForm = (props) => {
 									<button
 										className={removeButton}
 										type="button"
-										onClick={removeInterestHandler}>
+										onClick={() => removeInterestHandler(index)}>
 										x
 									</button>
 								</li>
@@ -239,7 +299,7 @@ const UserForm = (props) => {
 						/>
 						Others
 						<br />
-						<div style={{ color: 'red' }}>{error.genderError}</div>
+						<div className={errorMessage}>{genderError}</div>
 						<br />
 						<button type="submit">Submit</button>
 					</div>

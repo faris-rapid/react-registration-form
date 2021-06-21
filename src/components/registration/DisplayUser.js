@@ -3,16 +3,15 @@ import Table from '@material-ui/core/Table';
 import { TableBody, TableCell, TableHead, TableRow } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { v4 } from 'uuid';
+import { useSelector } from 'react-redux';
 
-const DisplayUser = (props) => {
-	const { fname, lname, email, dob, gender, interestList } = props.userData;
+const DisplayUser = () => {
+	const formData = useSelector((state) => state.formData);
+	const interestList = useSelector((state) => state.interestList);
 
 	const userData = {
-		Name: `${fname} ${lname}`,
-		Email: email,
-		DOB: dob,
-		Gender: gender,
-		Interests: interestList.map((element) => <li key={v4()}>{element}</li>),
+		...formData,
+		interest: interestList.map((element) => <li key={v4()}>{element}</li>),
 	};
 
 	return (
