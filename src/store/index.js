@@ -57,5 +57,6 @@ const store = configureStore({
 	reducer: registrationSlice.reducer,
 });
 
+export const reducer = registrationSlice.reducer;
 export const registrationActions = registrationSlice.actions;
 export default store;
