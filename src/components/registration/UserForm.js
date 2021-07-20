@@ -21,7 +21,7 @@ const UserForm = () => {
 
   let countryLists = CountryList;
 
-  //country suggestion picks
+  //country suggestion picksz
   const suggestionHandler = (event) => {
     dispatch(
       registrationActions.onChangeHandler({ country: event.target.innerText })
